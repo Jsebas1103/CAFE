@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Originador - Cadena Génesis</title>
+    <link rel="stylesheet" href="css/originador.css">
+    <script src="BlockChain.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Originador: Crear Cadena Génesis</h1>
+        
+    </div>
+    <div class="form-section">
+        <form id="genesisForm">
+            <label for="chainName">Nombre de la cadena:</label>
+            <input type="text" id="chainName" name="chainName" required>
+            <label for="type">Tipo (Producto/Servicio):</label>
+            <select id="type" name="type">
+                <option value="Producto">Producto</option>
+                <option value="Servicio">Servicio</option>
+            </select>
+            <label for="element">Elemento inicial:</label>
+            <input type="text" id="element" name="element" required>
+            <button type="submit">Crear Cadena Génesis</button>
+        </form>
+        <div id="genesisSuccess" class="success" style="display:none;"></div>
+    </div>
+    <script>
+        // Usar Blockchain y Block adaptados para navegador
+        document.getElementById('genesisForm').onsubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('chainName').value;
+            const typeValue = document.getElementById('type').value;
+            const element = document.getElementById('element').value;
+            // Crear cadena génesis
+            if(window.Blockchain) {
+                // Recuperar cadenas de localStorage
+                let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+                const chain = new window.Blockchain({ nombre: name, tipo: typeValue, elemento: element });
+                chain.name = name;
+                chains.push(chain);
+                localStorage.setItem('chains', JSON.stringify(chains));
+                window.currentChain = chain;
+                document.getElementById('genesisSuccess').style.display = 'block';
+                document.getElementById('genesisSuccess').textContent = `Cadena "${name}" creada con éxito.`;
+            } else {
+                alert('BlockChain.js no está cargado correctamente.');
+            }
+        };
+    </script>
+</body>
+</html>

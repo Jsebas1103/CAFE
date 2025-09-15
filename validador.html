@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Validador - Trazabilidad de Cadena</title>
+    <link rel="stylesheet" href="css/validador.css">
+    <script src="BlockChain.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Validador: Trazabilidad de Cadena</h1>
+    </div>
+    <div class="trace-section">
+        <div class="select-chain">
+            <label for="chainName">Selecciona la cadena:</label>
+            <select id="chainName">
+                <option value="">-- Selecciona --</option>
+            </select>
+            <button id="showTrace">Mostrar Trazabilidad</button>
+        </div>
+        <h2>Bloques de la Cadena</h2>
+        <ul id="chainList" class="chain-list"></ul>
+    </div>
+    <script>
+        // Leer cadenas desde localStorage y mostrar datos planos si no se pueden reconstruir
+        function getChainsFromStorage() {
+            let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+            // Si no hay cadenas, devolver array vacío
+            if (!chains || !chains.length) return [];
+            // Si el objeto tiene .chain y .name, devolver tal cual
+            return chains.map(obj => ({
+                name: obj.name || (obj.chain && obj.chain[0] && obj.chain[0].data && obj.chain[0].data.nombre) || 'Sin nombre',
+                chain: obj.chain || []
+            }));
+        }
+
+        function updateChainOptions() {
+            const select = document.getElementById('chainName');
+            select.innerHTML = '<option value="">-- Selecciona --</option>';
+            const chains = getChainsFromStorage();
+            if(chains.length) {
+                chains.forEach(chain => {
+                    const opt = document.createElement('option');
+                    opt.value = chain.name;
+                    opt.textContent = chain.name;
+                    select.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No hay cadenas disponibles';
+                select.appendChild(opt);
+            }
+        }
+
+        document.getElementById('showTrace').onclick = function() {
+            const name = document.getElementById('chainName').value;
+            const chains = getChainsFromStorage();
+            const chain = chains.find(c => c.name === name);
+            const list = document.getElementById('chainList');
+            list.innerHTML = '';
+            if(chain && chain.chain.length) {
+                chain.chain.forEach((block, idx) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>Bloque #${idx}</strong><br>Datos: ${typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}<br>Hash: ${block.hash || 'N/A'}<br>Previo: ${block.previousHash || 'N/A'}`;
+                    list.appendChild(li);
+                });
+            } else {
+                list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene bloques.</li>';
+            }
+        };
+        // Inicializar opciones al cargar
+        updateChainOptions();
+    </script>
+</body>
+</html>

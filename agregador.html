@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregador - Agregar Bloque</title>
+    <link rel="stylesheet" href="css/agregador.css">
+    <script src="BlockChain.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Agregador: Añadir Bloque</h1>
+    </div>
+    <div class="form-section">
+        <form id="addBlockForm">
+            <label for="chainName">Nombre de la cadena:</label>
+            <input type="text" id="chainName" name="chainName" required>
+            <label for="blockData">Datos del bloque:</label>
+            <input type="text" id="blockData" name="blockData" required>
+            <button type="submit">Agregar Bloque</button>
+        </form>
+        <div id="addBlockSuccess" class="success" style="display:none;"></div>
+    </div>
+    <script>
+        // Usar Blockchain y Block adaptados para navegador y localStorage
+        document.getElementById('addBlockForm').onsubmit = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('chainName').value;
+            const data = document.getElementById('blockData').value;
+            // Recuperar cadenas de localStorage
+            let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+            // Reconstruir objetos Blockchain
+            chains = chains.map(obj => {
+                const chain = new window.Blockchain(obj.chain[0].data);
+                chain.name = obj.name;
+                // Agregar los bloques adicionales
+                for(let i=1; i<obj.chain.length; i++) {
+                    chain.addBlock(obj.chain[i].data);
+                }
+                return chain;
+            });
+            // Buscar la cadena por nombre
+            const chain = chains.find(c => c.name === name);
+            if(chain) {
+                chain.addBlock(data);
+                // Actualizar en localStorage
+                const updatedChains = chains.map(c => c.name === name ? chain : c);
+                localStorage.setItem('chains', JSON.stringify(updatedChains));
+                document.getElementById('addBlockSuccess').style.display = 'block';
+                document.getElementById('addBlockSuccess').textContent = `Bloque agregado a la cadena "${name}".`;
+            } else {
+                alert('Cadena no encontrada o BlockChain.js no cargado.');
+            }
+        };
+    </script>
+</body>
+</html>
