@@ -14,13 +14,14 @@ function simpleHash(str) {
 class Block {
     constructor(index, data, previousHash = "") {
         this.index = index;
-        this.date = new Date().toISOString();
         this.data = data;
         this.previousHash = previousHash;
+        this.date = new Date(); // Guarda el objeto Date
+        this.dateString = this.date.toISOString(); // Guarda la fecha en formato legible
         this.hash = this.createHash();
     }
     createHash() {
-        return simpleHash(this.index + this.date + JSON.stringify(this.data) + this.previousHash);
+        return simpleHash(this.index + this.dateString + JSON.stringify(this.data) + this.previousHash);
     }
 }
 

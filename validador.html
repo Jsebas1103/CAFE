@@ -63,7 +63,11 @@
             if(chain && chain.chain.length) {
                 chain.chain.forEach((block, idx) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>Bloque #${idx}</strong><br>Datos: ${typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}<br>Hash: ${block.hash || 'N/A'}<br>Previo: ${block.previousHash || 'N/A'}`;
+                    li.innerHTML = `<strong>Bloque #${idx}</strong><br>
+                        Fecha: ${block.dateString || (block.date ? block.date : 'N/A')}<br>
+                        Datos: ${typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}<br>
+                        Hash: ${block.hash || 'N/A'}<br>
+                        Previo: ${block.previousHash || 'N/A'}`;
                     list.appendChild(li);
                 });
             } else {
