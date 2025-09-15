@@ -1,5 +1,15 @@
 
-
+// Hash simple para navegador (no seguro, solo demostración)
+function simpleHash(str) {
+    let hash = 0, i, chr;
+    if (str.length === 0) return hash;
+    for (i = 0; i < str.length; i++) {
+        chr   = str.charCodeAt(i);
+        hash  = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+    return hash.toString();
+}
 
 class Block {
     constructor(index, data, previousHash = "") {
@@ -11,7 +21,7 @@ class Block {
         this.hash = this.createHash();
     }
     createHash() {
-        return CryptoJS.SHA256(this.index + this.dateString + JSON.stringify(this.data) + this.previousHash).toString();
+        return simpleHash(this.index + this.dateString + JSON.stringify(this.data) + this.previousHash);
     }
 }
 
