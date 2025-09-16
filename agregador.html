@@ -8,32 +8,56 @@
 </head>
 <body>
     <div class="header">
-        <h1>Agregador: Añadir Bloque</h1>
-        <a href="validador.html" class="nav-item nav-link active">validador</a>
+        <img src="img/cafe-icon.png" class="cafe-icon" alt="Café">
+        <h1 style="display:inline;">Agregador: Añadir Movimiento de Café</h1>
+        <a href="validador.html" class="nav-item nav-link active">Validador</a>
     </div>
     <div class="form-section">
         <form id="addBlockForm">
             <label for="chainName">Nombre de la cadena:</label>
-            <input type="text" id="chainName" name="chainName" required>
-            <label for="blockData">Datos del bloque:</label>
-            <input type="text" id="blockData" name="blockData" required>
-            <button type="submit">Agregar Bloque</button>
+            <input type="text" id="chainName" name="chainName" required placeholder="Ej: CafePremium2024">
+
+            <label for="coffeeType">Tipo de café:</label>
+            <input type="text" id="coffeeType" name="coffeeType" required placeholder="Ej: Arábica, Robusta">
+
+            <label for="quantity">Cantidad (kg):</label>
+            <input type="number" id="quantity" name="quantity" required min="1" placeholder="Ej: 50">
+
+            <label for="buyer">Comprador:</label>
+            <input type="text" id="buyer" name="buyer" required placeholder="Nombre del comprador">
+
+            <label for="blockData">Notas adicionales:</label>
+            <input type="text" id="blockData" name="blockData" placeholder="Notas (opcional)">
+
+            <button type="submit">Agregar Movimiento</button>
         </form>
         <div id="addBlockSuccess" class="success" style="display:none;"></div>
+        <div id="blockHash" class="success" style="display:none;"></div>
     </div>
     <script>
-        // Usar Blockchain y Block adaptados para navegador y localStorage
         document.getElementById('addBlockForm').onsubmit = function(e) {
             e.preventDefault();
             const name = document.getElementById('chainName').value;
-            const data = document.getElementById('blockData').value;
+            const coffeeType = document.getElementById('coffeeType').value;
+            const quantity = document.getElementById('quantity').value;
+            const buyer = document.getElementById('buyer').value;
+            const notes = document.getElementById('blockData').value;
+
+            // Estructura de datos del bloque
+            const blockData = {
+                tipoCafe: coffeeType,
+                cantidad: quantity,
+                comprador: buyer,
+                notas: notes,
+                entregado: false // Estado inicial
+            };
+
             // Recuperar cadenas de localStorage
             let chains = JSON.parse(localStorage.getItem('chains') || '[]');
             // Reconstruir objetos Blockchain
             chains = chains.map(obj => {
                 const chain = new window.Blockchain(obj.chain[0].data);
                 chain.name = obj.name;
-                // Agregar los bloques adicionales
                 for(let i=1; i<obj.chain.length; i++) {
                     chain.addBlock(obj.chain[i].data);
                 }
@@ -42,12 +66,16 @@
             // Buscar la cadena por nombre
             const chain = chains.find(c => c.name === name);
             if(chain) {
-                chain.addBlock(data);
+                const prevLength = chain.chain.length;
+                chain.addBlock(blockData);
+                const newBlock = chain.chain[prevLength];
                 // Actualizar en localStorage
                 const updatedChains = chains.map(c => c.name === name ? chain : c);
                 localStorage.setItem('chains', JSON.stringify(updatedChains));
                 document.getElementById('addBlockSuccess').style.display = 'block';
-                document.getElementById('addBlockSuccess').textContent = `Bloque agregado a la cadena "${name}".`;
+                document.getElementById('addBlockSuccess').textContent = `Movimiento agregado a la cadena "${name}".`;
+                document.getElementById('blockHash').style.display = 'block';
+                document.getElementById('blockHash').textContent = `Hash de seguimiento: ${newBlock.hash}`;
             } else {
                 alert('Cadena no encontrada o BlockChain.js no cargado.');
             }
@@ -55,3 +83,4 @@
     </script>
 </body>
 </html>
+       

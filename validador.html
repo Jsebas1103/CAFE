@@ -8,7 +8,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>Validador: Trazabilidad de Cadena</h1>
+        <img src="img/cafe-icon.png" class="cafe-icon" alt="Café">
+        <h1 style="display:inline;">Validador: Trazabilidad de Café</h1>
         <a href="Menu.html" class="nav-item nav-link active">Menu</a>
     </div>
     <div class="trace-section">
@@ -19,16 +20,13 @@
             </select>
             <button id="showTrace">Mostrar Trazabilidad</button>
         </div>
-        <h2>Bloques de la Cadena</h2>
+        <h2>Movimientos de la Cadena</h2>
         <ul id="chainList" class="chain-list"></ul>
     </div>
     <script>
-        // Leer cadenas desde localStorage y mostrar datos planos si no se pueden reconstruir
         function getChainsFromStorage() {
             let chains = JSON.parse(localStorage.getItem('chains') || '[]');
-            // Si no hay cadenas, devolver array vacío
             if (!chains || !chains.length) return [];
-            // Si el objeto tiene .chain y .name, devolver tal cual
             return chains.map(obj => ({
                 name: obj.name || (obj.chain && obj.chain[0] && obj.chain[0].data && obj.chain[0].data.nombre) || 'Sin nombre',
                 chain: obj.chain || []
@@ -54,6 +52,10 @@
             }
         }
 
+        function saveChainsToStorage(chains) {
+            localStorage.setItem('chains', JSON.stringify(chains));
+        }
+
         document.getElementById('showTrace').onclick = function() {
             const name = document.getElementById('chainName').value;
             const chains = getChainsFromStorage();
@@ -62,20 +64,42 @@
             list.innerHTML = '';
             if(chain && chain.chain.length) {
                 chain.chain.forEach((block, idx) => {
+                    const isEntregado = block.data && block.data.entregado;
                     const li = document.createElement('li');
-                    li.innerHTML = `<strong>Bloque #${idx}</strong><br>
+                    li.innerHTML = `<strong>Movimiento #${idx}</strong><br>
                         Fecha: ${block.dateString || (block.date ? block.date : 'N/A')}<br>
-                        Datos: ${typeof block.data === 'object' ? JSON.stringify(block.data) : block.data}<br>
-                        Hash: ${block.hash || 'N/A'}<br>
-                        Previo: ${block.previousHash || 'N/A'}`;
+                        Tipo de café: ${block.data && block.data.tipoCafe ? block.data.tipoCafe : '-'}<br>
+                        Cantidad: ${block.data && block.data.cantidad ? block.data.cantidad : '-'} kg<br>
+                        Comprador: ${block.data && block.data.comprador ? block.data.comprador : '-'}<br>
+                        Notas: ${block.data && block.data.notas ? block.data.notas : '-'}<br>
+                        Hash: <span style="font-size:0.9em;">${block.hash || 'N/A'}</span><br>
+                        Estado: <span class="${isEntregado ? 'entregado' : 'no-entregado'}">${isEntregado ? 'ENTREGADO' : 'NO ENTREGADO'}</span>
+                        <br>
+                        <button ${isEntregado ? 'disabled' : ''} data-block="${idx}">${isEntregado ? 'Entregado' : 'Marcar como Entregado'}</button>
+                        `;
                     list.appendChild(li);
                 });
+
+                // Botón de marcar como entregado
+                Array.from(list.querySelectorAll('button[data-block]')).forEach(btn => {
+                    btn.onclick = function() {
+                        const blockIdx = parseInt(btn.getAttribute('data-block'));
+                        // Actualizar en localStorage
+                        let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+                        let chainObj = chains.find(c => c.name === name);
+                        if(chainObj && chainObj.chain[blockIdx] && chainObj.chain[blockIdx].data) {
+                            chainObj.chain[blockIdx].data.entregado = true;
+                            localStorage.setItem('chains', JSON.stringify(chains));
+                            document.getElementById('showTrace').click();
+                        }
+                    };
+                });
             } else {
-                list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene bloques.</li>';
+                list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene movimientos.</li>';
             }
         };
-        // Inicializar opciones al cargar
         updateChainOptions();
     </script>
 </body>
 </html>
+  

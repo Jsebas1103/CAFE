@@ -8,21 +8,22 @@
 </head>
 <body>
     <div class="header">
-        <h1>Originador: Crear Cadena Génesis</h1>
-        
-<a href="agregador.html" class="nav-item nav-link active">Agregador</a>
+        <img src="img/cafe-icon.png" class="cafe-icon" alt="Café">
+        <h1 style="display:inline;">Originador: Crear Cadena de Café</h1>
+        <a href="agregador.html" class="nav-item nav-link active">Agregador</a>
     </div>
     <div class="form-section">
         <form id="genesisForm">
             <label for="chainName">Nombre de la cadena:</label>
-            <input type="text" id="chainName" name="chainName" required>
-            <label for="type">Tipo (Producto/Servicio):</label>
+            <input type="text" id="chainName" name="chainName" required placeholder="Ej: CafePremium2024">
+            <label for="type">Tipo de producto:</label>
             <select id="type" name="type">
-                <option value="Producto">Producto</option>
-                <option value="Servicio">Servicio</option>
+                <option value="Café Verde">Café Verde</option>
+                <option value="Café Tostado">Café Tostado</option>
+                <option value="Otro">Otro</option>
             </select>
-            <label for="element">Elemento inicial:</label>
-            <input type="text" id="element" name="element" required>
+            <label for="element">Descripción inicial:</label>
+            <input type="text" id="element" name="element" required placeholder="Ej: Lote #123, finca, origen...">
             <button type="submit">Crear Cadena Génesis</button>
         </form>
         <div id="genesisSuccess" class="success" style="display:none;"></div>
@@ -37,7 +38,7 @@
             if(window.Blockchain) {
                 // Recuperar cadenas de localStorage
                 let chains = JSON.parse(localStorage.getItem('chains') || '[]');
-                const chain = new window.Blockchain({ nombre: name, tipo: typeValue, elemento: element });
+                const chain = new window.Blockchain({ nombre: name, tipo: typeValue, descripcion: element });
                 chain.name = name;
                 chains.push(chain);
                 localStorage.setItem('chains', JSON.stringify(chains));

@@ -1,48 +1,69 @@
 /* Estilos para Agregador */
 body {
-    background: #e9ecef;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f3ee url('img/cafe-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #4b2e19;
 }
 .header {
-    background: #1d3557;
+    background: #7b4f27;
     color: #fff;
-    padding: 1rem;
+    padding: 1em;
     text-align: center;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 8px #bfa67a55;
+}
+.nav-item {
+    color: #fff;
+    margin-left: 2em;
+    text-decoration: none;
+    font-weight: bold;
 }
 .form-section {
-    background: #fff;
-    margin: 2rem auto;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    max-width: 500px;
+    background: #fff8f0cc;
+    margin: 2em auto;
+    padding: 2em;
+    border-radius: 10px;
+    max-width: 400px;
+    box-shadow: 0 4px 16px #bfa67a33;
 }
-.form-section label {
+label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-top: 1em;
     font-weight: bold;
 }
-.form-section input, .form-section select {
+input, select {
     width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #bbb;
-    border-radius: 4px;
+    padding: 0.5em;
+    margin-top: 0.3em;
+    border: 1px solid #bfa67a;
+    border-radius: 5px;
+    background: #f9f6f2;
 }
-.form-section button {
-    background: #1d3557;
+button {
+    background: #7b4f27;
     color: #fff;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    padding: 0.7em 2em;
+    border-radius: 5px;
+    margin-top: 1.5em;
+    font-size: 1em;
     cursor: pointer;
-    font-size: 1rem;
+    transition: background 0.2s;
 }
-.form-section button:hover {
-    background: #457b9d;
+button:hover {
+    background: #a67c52;
 }
 .success {
-    color: #457b9d;
-    font-weight: bold;
-    margin-top: 1rem;
+    margin-top: 1em;
+    color: #388e3c;
+    background: #e8f5e9;
+    border-left: 4px solid #388e3c;
+    padding: 0.7em;
+    border-radius: 5px;
+}
+.cafe-icon {
+    width: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
 }

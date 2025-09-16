@@ -1,46 +1,78 @@
 /* Estilos para Validador */
 body {
-    background: #f8f9fa;
-    font-family: 'Roboto', Arial, sans-serif;
+    background: #f5f3ee url('img/cafe-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #4b2e19;
 }
 .header {
-    background: #6c757d;
+    background: #7b4f27;
     color: #fff;
-    padding: 1rem;
+    padding: 1em;
     text-align: center;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 8px #bfa67a55;
+}
+.nav-item {
+    color: #fff;
+    margin-left: 2em;
+    text-decoration: none;
+    font-weight: bold;
 }
 .trace-section {
-    background: #fff;
-    margin: 2rem auto;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    background: #fff8f0cc;
+    margin: 2em auto;
+    padding: 2em;
+    border-radius: 10px;
     max-width: 700px;
+    box-shadow: 0 4px 16px #bfa67a33;
 }
-.trace-section h2 {
-    color: #6c757d;
-    margin-bottom: 1rem;
+.select-chain {
+    margin-bottom: 2em;
+}
+label {
+    font-weight: bold;
+}
+select, button {
+    padding: 0.5em;
+    border-radius: 5px;
+    border: 1px solid #bfa67a;
+    background: #f9f6f2;
+    margin-left: 0.5em;
+}
+button {
+    background: #7b4f27;
+    color: #fff;
+    border: none;
+    margin-top: 0.5em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #a67c52;
 }
 .chain-list {
     list-style: none;
     padding: 0;
 }
 .chain-list li {
-    background: #e2e3e5;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border-radius: 6px;
-    border-left: 5px solid #6c757d;
+    background: #fff;
+    margin-bottom: 1em;
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #bfa67a22;
+    position: relative;
 }
-.select-chain {
-    margin-bottom: 2rem;
-}
-.select-chain label {
+.entregado {
+    color: #388e3c;
     font-weight: bold;
 }
-.select-chain select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #bbb;
+.no-entregado {
+    color: #b71c1c;
+    font-weight: bold;
+}
+.cafe-icon {
+    width: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
 }
