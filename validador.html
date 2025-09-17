@@ -5,6 +5,13 @@
     <title>Validador | Trazabilidad de Cadena</title>
     <link rel="stylesheet" href="css/validador.css">
     <script src="BlockChain.js"></script>
+    <style>
+        /* 🔎 Resaltar el bloque encontrado */
+        .highlight {
+            border: 2px solid green;
+            background-color: #f6fff6;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -12,110 +19,170 @@
         <h1 style="display:inline;">Validador: Trazabilidad de Café</h1>
         <a href="Menu.html" class="nav-item nav-link active">Menu</a>
     </div>
-<div class="trace-section">
-    <div class="select-chain">
-        <label for="chainName">Selecciona la cadena:</label>
-        <select id="chainName">
-            <option value="">-- Selecciona --</option>
-        </select>
-        <button id="showTrace">Mostrar Trazabilidad</button>
-    </div>
-    <h2>Movimientos de la Cadena</h2>
-    <div id="chainStatus" class="status"></div>
-    <ul id="chainList" class="chain-list"></ul>
-</div>
-    <p id="validityMsg"></p>
-    <ul id="chainList" class="chain-list"></ul>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script>
-    // Recuperar cadenas guardadas en localStorage
-    function getChainsFromStorage() {
-        let chains = JSON.parse(localStorage.getItem('chains') || '[]');
-        return chains.map(obj => ({
-            name: obj.name,
-            chain: obj.chain
-        }));
-    }
-    // Llenar el selector de cadenas disponibles
-    function updateChainOptions() {
-        const select = document.getElementById('chainName');
-        select.innerHTML = '<option value="">-- Selecciona --</option>';
-        const chains = getChainsFromStorage();
-        if (chains.length) {
-            chains.forEach(chain => {
-                const opt = document.createElement('option');
-                opt.value = chain.name;
-                opt.textContent = chain.name;
-                select.appendChild(opt);
-            });
-        } else {
-            const opt = document.createElement('option');
-            opt.value = '';
-            opt.textContent = 'No hay cadenas disponibles';
-            select.appendChild(opt);
-        }
-    }
-    // Función para recalcular hash igual que en Block.createHash
-    function computeBlockHash(block) {
-        return simpleHash(
-            block.index + block.dateString + JSON.stringify(block.data) + block.previousHash
-        );
-    }
-    // Validar la cadena
-    function validateChain(chain) {
-        for (let i = 1; i < chain.length; i++) {
-            const prev = chain[i - 1];
-            const current = chain[i];
-            const hashCheck = computeBlockHash(current);
-            if (current.hash !== hashCheck || current.previousHash !== prev.hash) {
-                console.warn("❌ Error en bloque", i, {
-                    esperado: hashCheck,
-                    guardado: current.hash,
-                    prevEsperado: prev.hash,
-                    prevGuardado: current.previousHash
-                });
-                return false;
-            }
-        }
-        return true;
-    }
 
-    // Mostrar trazabilidad al dar clic
-    document.getElementById('showTrace').onclick = function() {
-        const name = document.getElementById('chainName').value;
-        const chains = getChainsFromStorage();
-        const chainObj = chains.find(c => c.name === name);
-        const list = document.getElementById('chainList');
-        const statusDiv = document.getElementById('chainStatus');
-        list.innerHTML = '';
-        statusDiv.innerHTML = '';
-        if (chainObj && chainObj.chain.length) {
-            const chain = chainObj.chain;
-            if (validateChain(chain)) {
-                statusDiv.textContent = "✅ Cadena válida: no ha sido alterada.";
-                statusDiv.style.color = "green";
-            } else {
-                statusDiv.textContent = "❌ Cadena inválida: se detectaron modificaciones.";
-                statusDiv.style.color = "red";
-            }
-            chain.forEach((block, idx) => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>Bloque #${idx}</strong><br>
-                    Fecha: ${block.dateString ? new Date(block.dateString).toLocaleString() : 'N/A'}<br>
-                    Tipo de café: ${block.data?.tipoCafe || '-'}<br>
-                    Cantidad: ${block.data?.cantidad || '-'} kg<br>
-                    Comprador: ${block.data?.comprador || '-'}<br>
-                    Notas: ${block.data?.notas || '-'}<br>
-                    Hash: <span style="font-size:0.9em;">${block.hash || 'N/A'}</span><br>
-                    Previous Hash: <span style="font-size:0.9em;">${block.previousHash || 'N/A'}</span>`;
-                list.appendChild(li);
-            });
-        } else {
-            list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene movimientos.</li>';
+    <div class="trace-section">
+        <div class="select-chain">
+            <label for="chainName">Selecciona la cadena:</label>
+            <select id="chainName">
+                <option value="">-- Selecciona --</option>
+            </select>
+            <button id="showTrace">Mostrar Trazabilidad</button>
+        </div>
+
+        <!-- 🔎 Buscador por hash -->
+        <div class="search-hash" style="margin-top:20px;">
+            <label for="hashSearch">Buscar por Hash:</label>
+            <input type="text" id="hashSearch" placeholder="Pega aquí el hash...">
+            <button id="searchHashBtn">Buscar</button>
+        </div>
+        <div id="hashResult" style="margin-top:20px;"></div>
+
+        <h2>Movimientos de la Cadena</h2>
+        <div id="chainStatus" class="status"></div>
+        <ul id="chainList" class="chain-list"></ul>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        function getChainsFromStorage() {
+            let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+            return chains.map(obj => ({
+                name: obj.name,
+                chain: obj.chain
+            }));
         }
-    };
-    updateChainOptions();
-</script>
+
+        function updateChainOptions() {
+            const select = document.getElementById('chainName');
+            select.innerHTML = '<option value="">-- Selecciona --</option>';
+            const chains = getChainsFromStorage();
+            if (chains.length) {
+                chains.forEach(chain => {
+                    const opt = document.createElement('option');
+                    opt.value = chain.name;
+                    opt.textContent = chain.name;
+                    select.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = 'No hay cadenas disponibles';
+                select.appendChild(opt);
+            }
+        }
+
+        function computeBlockHash(block) {
+            return simpleHash(
+                block.index + block.dateString + JSON.stringify(block.data) + block.previousHash
+            );
+        }
+
+        function validateChain(chain) {
+            for (let i = 1; i < chain.length; i++) {
+                const prev = chain[i - 1];
+                const current = chain[i];
+                const hashCheck = computeBlockHash(current);
+                if (current.hash !== hashCheck || current.previousHash !== prev.hash) {
+                    console.warn("❌ Error en bloque", i, {
+                        esperado: hashCheck,
+                        guardado: current.hash,
+                        prevEsperado: prev.hash,
+                        prevGuardado: current.previousHash
+                    });
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        document.getElementById('showTrace').onclick = function() {
+            const name = document.getElementById('chainName').value;
+            const chains = getChainsFromStorage();
+            const chainObj = chains.find(c => c.name === name);
+            const list = document.getElementById('chainList');
+            const statusDiv = document.getElementById('chainStatus');
+            list.innerHTML = '';
+            statusDiv.innerHTML = '';
+
+            if (chainObj && chainObj.chain.length) {
+                const chain = chainObj.chain;
+
+                if (validateChain(chain)) {
+                    statusDiv.textContent = "✅ Cadena válida: no ha sido alterada.";
+                    statusDiv.style.color = "green";
+                } else {
+                    statusDiv.textContent = "❌ Cadena inválida: se detectaron modificaciones.";
+                    statusDiv.style.color = "red";
+                }
+
+                chain.forEach((block, idx) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>Bloque #${idx}</strong><br>
+                        Fecha: ${block.dateString ? new Date(block.dateString).toLocaleString() : 'N/A'}<br>
+                        ${block.data?.tipoCafe 
+                            ? `Tipo de café: ${block.data.tipoCafe}<br>
+                               Cantidad: ${block.data.cantidad} kg<br>
+                               Comprador: ${block.data.comprador}<br>
+                               Notas: ${block.data.notas}<br>`
+                            : `Nombre cadena: ${block.data?.nombre || '-'}<br>
+                               Tipo inicial: ${block.data?.tipo || '-'}<br>
+                               Descripción: ${block.data?.descripcion || '-'}<br>`}
+                        Hash: <span style="font-size:0.9em;">${block.hash || 'N/A'}</span><br>
+                        Previous Hash: <span style="font-size:0.9em;">${block.previousHash || 'N/A'}</span>`;
+                    list.appendChild(li);
+                });
+
+            } else {
+                list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene movimientos.</li>';
+            }
+        };
+        //Para buscar el hash
+        document.getElementById('searchHashBtn').onclick = function() {
+            const hashToFind = document.getElementById('hashSearch').value.trim();
+            const resultDiv = document.getElementById('hashResult');
+            resultDiv.innerHTML = '';
+
+            if (!hashToFind) {
+                resultDiv.innerHTML = "<p style='color:orange;'>⚠️ Ingresa un hash para buscar.</p>";
+                return;
+            }
+
+            const chains = getChainsFromStorage();
+            let found = false;
+
+            chains.forEach(chainObj => {
+                chainObj.chain.forEach((block, idx) => {
+                    if (block.hash === hashToFind) {
+                        found = true;
+                        resultDiv.innerHTML = `
+                            <h3 style="color:green;">✅ Hash encontrado en la cadena <strong>${chainObj.name}</strong></h3>
+                            <ul class="chain-list">
+                                <li class="highlight">
+                                    <strong>Bloque #${idx}</strong><br>
+                                    Fecha: ${block.dateString ? new Date(block.dateString).toLocaleString() : 'N/A'}<br>
+                                    ${block.data?.tipoCafe 
+                                        ? `Tipo de café: ${block.data.tipoCafe}<br>
+                                           Cantidad: ${block.data.cantidad} kg<br>
+                                           Comprador: ${block.data.comprador}<br>
+                                           Notas: ${block.data.notas}<br>`
+                                        : `Nombre cadena: ${block.data?.nombre || '-'}<br>
+                                           Tipo inicial: ${block.data?.tipo || '-'}<br>
+                                           Descripción: ${block.data?.descripcion || '-'}<br>`}
+                                    Hash: <span style="font-size:0.9em;">${block.hash || 'N/A'}</span><br>
+                                    Previous Hash: <span style="font-size:0.9em;">${block.previousHash || 'N/A'}</span>
+                                </li>
+                            </ul>
+                        `;
+                    }
+                });
+            });
+
+            if (!found) {
+                resultDiv.innerHTML = "<p style='color:red;'> No se encontró ningún bloque con ese hash.</p>";
+            }
+        };
+
+        updateChainOptions();
+    </script>
 </body>
 </html>
