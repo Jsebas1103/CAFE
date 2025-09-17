@@ -1,5 +1,3 @@
-
-// Hash simple para navegador (no seguro, solo demostración)
 function simpleHash(str) {
     let hash = 0, i, chr;
     if (str.length === 0) return hash;
@@ -11,6 +9,8 @@ function simpleHash(str) {
     return hash.toString();
 }
 
+
+///CAMBIOS GITHUB
 class Block {
     constructor(index, data, previousHash = "") {
         this.index = index;
