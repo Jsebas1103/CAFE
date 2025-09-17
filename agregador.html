@@ -1,86 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Agregador - Agregar Bloque</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free Website Template" name="keywords">
+    <meta content="Free Website Template" name="description">
+    <link href="img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <link href="css/style.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/agregador.css">
     <script src="BlockChain.js"></script>
 </head>
+
 <body>
-    <div class="header">
-        <img src="img/cafe-icon.png" class="cafe-icon" alt="Café">
-        <h1 style="display:inline;">Agregador: Añadir Movimiento de Café</h1>
-        <a href="validador.html" class="nav-item nav-link active">Validador</a>
+    <div class="container-fluid p-0 nav-bar">
+        <nav class="navbar navbar-expand-lg bg-none navbar-dark py-3">
+            <a href="index.html" class="navbar-brand px-lg-4 m-0">
+                <h1 class="m-0 display-4 text-uppercase text-white">KOPPEE</h1>
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <div class="navbar-nav ml-auto p-4">
+                    <a href="index.html" class="nav-item nav-link">Home</a>
+
+                    <a href="originador.html" class="nav-item nav-link">Originador</a>
+                    <a href="validador.html" class="nav-item nav-link">Validador</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="container-fluid page-header mb-5 position-relative overlay-bottom">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 400px">
+            <h1 class="display-3 text-white mt-5">AGREGADOR</h1>
+            <div class="d-inline-flex text-white">
+                <p class="m-0"><a class="text-white" href="index.html">Home</a></p>
+                <p class="m-0 px-2">/</p>
+                <p class="m-0">Agregador</p>
+            </div>
+        </div>
     </div>
     <div class="form-section">
         <form id="addBlockForm">
-            <label for="chainName">Nombre de la cadena:</label>
-            <input type="text" id="chainName" name="chainName" required placeholder="Ej: CafePremium2024">
-
+            <label for="chainName">Selecciona la cadena:</label>
+            <select id="chainName" name="chainName" required>
+                <option value="">-- Selecciona --</option>
+            </select>
             <label for="coffeeType">Tipo de café:</label>
             <input type="text" id="coffeeType" name="coffeeType" required placeholder="Ej: Arábica, Robusta">
-
             <label for="quantity">Cantidad (kg):</label>
             <input type="number" id="quantity" name="quantity" required min="1" placeholder="Ej: 50">
-
             <label for="buyer">Comprador:</label>
             <input type="text" id="buyer" name="buyer" required placeholder="Nombre del comprador">
-
             <label for="blockData">Notas adicionales:</label>
             <input type="text" id="blockData" name="blockData" placeholder="Notas (opcional)">
-
             <button type="submit">Agregar Movimiento</button>
         </form>
         <div id="addBlockSuccess" class="success" style="display:none;"></div>
         <div id="blockHash" class="success" style="display:none;"></div>
-    </div>
-    <script>
-        document.getElementById('addBlockForm').onsubmit = function(e) {
-            e.preventDefault();
-            const name = document.getElementById('chainName').value;
-            const coffeeType = document.getElementById('coffeeType').value;
-            const quantity = document.getElementById('quantity').value;
-            const buyer = document.getElementById('buyer').value;
-            const notes = document.getElementById('blockData').value;
-
-            // Estructura de datos del bloque
-            const blockData = {
-                tipoCafe: coffeeType,
-                cantidad: quantity,
-                comprador: buyer,
-                notas: notes,
-                entregado: false // Estado inicial
-            };
-
-            // Recuperar cadenas de localStorage
-            let chains = JSON.parse(localStorage.getItem('chains') || '[]');
-            // Reconstruir objetos Blockchain
-            chains = chains.map(obj => {
+        <script>
+            function getChainsFromStorage() {
+                let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+                return chains;
+            }
+            function updateChainOptions() {
+                const select = document.getElementById('chainName');
+                select.innerHTML = '<option value="">-- Selecciona --</option>';
+                const chains = getChainsFromStorage();
+                if (chains.length) {
+                    chains.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.name;
+                        opt.textContent = c.name;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'No hay cadenas disponibles';
+                    select.appendChild(opt);
+                }
+            }
+            function rebuildChain(obj) {
                 const chain = new window.Blockchain(obj.chain[0].data);
                 chain.name = obj.name;
-                for(let i=1; i<obj.chain.length; i++) {
+                for (let i = 1; i < obj.chain.length; i++) {
                     chain.addBlock(obj.chain[i].data);
                 }
                 return chain;
-            });
-            // Buscar la cadena por nombre
-            const chain = chains.find(c => c.name === name);
-            if(chain) {
-                const prevLength = chain.chain.length;
-                chain.addBlock(blockData);
-                const newBlock = chain.chain[prevLength];
-                // Actualizar en localStorage
-                const updatedChains = chains.map(c => c.name === name ? chain : c);
-                localStorage.setItem('chains', JSON.stringify(updatedChains));
-                document.getElementById('addBlockSuccess').style.display = 'block';
-                document.getElementById('addBlockSuccess').textContent = `Movimiento agregado a la cadena "${name}".`;
-                document.getElementById('blockHash').style.display = 'block';
-                document.getElementById('blockHash').textContent = `Hash de seguimiento: ${newBlock.hash}`;
-            } else {
-                alert('Cadena no encontrada o BlockChain.js no cargado.');
             }
-        };
-    </script>
+            document.getElementById('addBlockForm').onsubmit = function(e) {
+                e.preventDefault();
+                const name = document.getElementById('chainName').value;
+                const coffeeType = document.getElementById('coffeeType').value;
+                const quantity = document.getElementById('quantity').value;
+                const buyer = document.getElementById('buyer').value;
+                const notes = document.getElementById('blockData').value;
+                const blockData = {
+                    tipoCafe: coffeeType,
+                    cantidad: quantity,
+                    comprador: buyer,
+                    notas: notes,
+                    estado: "Movimiento registrado"
+                };
+                let chains = JSON.parse(localStorage.getItem('chains') || '[]');
+                chains = chains.map(rebuildChain);
+                const chain = chains.find(c => c.name === name);
+                if (chain) {
+                    const prevLength = chain.chain.length;
+                    chain.addBlock(blockData);
+                    const newBlock = chain.chain[prevLength];
+                    const updatedChains = chains.map(c => ({
+                        name: c.name,
+                        chain: c.chain
+                    }));
+                    localStorage.setItem('chains', JSON.stringify(updatedChains));
+                    document.getElementById('addBlockSuccess').style.display = 'block';
+                    document.getElementById('addBlockSuccess').textContent = `Movimiento agregado a la cadena "${name}".`;
+                    document.getElementById('blockHash').style.display = 'block';
+                    document.getElementById('blockHash').textContent = `Hash de seguimiento: ${newBlock.hash}`;
+                } else {
+                    alert('Cadena no encontrada.');
+                }
+            };
+            updateChainOptions();
+        </script>
+    </div>
+    <!-- Footer Start -->
+    <div class="container-fluid text-white mt-5 px-0" style="background: #1b1b1b;">
+        <div class="row px-5 py-4">
+            <div class="col-lg-6 col-md-6 mb-4 mb-md-0">
+                <h2 class="text-white">KOPPEE</h2>
+                <p class="mb-0">Café de calidad y trazabilidad blockchain.</p>
+            </div>
+            <div class="col-lg-6 col-md-6 text-md-right">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-white px-2" href="index.html">Home</a>
+                    <a class="text-white px-2" href="about.html">About</a>
+                    <a class="text-white px-2" href="service.html">Service</a>
+                    <a class="text-white px-2" href="menu.html">Menu</a>
+                    <a class="text-white px-2" href="originador.html">Originador</a>
+                    <a class="text-white px-2" href="agregador.html">Agregador</a>
+                    <a class="text-white px-2" href="validador.html">Validador</a>
+                    <a class="text-white px-2" href="contact.html">Contact</a>
+                </div>
+            </div>
+        </div>
+        <div class="row px-5 pb-3">
+            <div class="col-12 text-center">
+                <small>© 2025 KOPPEE. Todos los derechos reservados.</small>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
 </body>
 </html>
        
