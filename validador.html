@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Validador - Trazabilidad de Cadena</title>
+    <title>Validador | Trazabilidad de Cadena</title>
     <link rel="stylesheet" href="css/validador.css">
     <script src="BlockChain.js"></script>
 </head>
@@ -37,7 +37,6 @@
             chain: obj.chain
         }));
     }
-
     // Llenar el selector de cadenas disponibles
     function updateChainOptions() {
         const select = document.getElementById('chainName');
@@ -57,22 +56,18 @@
             select.appendChild(opt);
         }
     }
-
     // Función para recalcular hash igual que en Block.createHash
     function computeBlockHash(block) {
         return simpleHash(
             block.index + block.dateString + JSON.stringify(block.data) + block.previousHash
         );
     }
-
     // Validar la cadena
     function validateChain(chain) {
         for (let i = 1; i < chain.length; i++) {
             const prev = chain[i - 1];
             const current = chain[i];
-
             const hashCheck = computeBlockHash(current);
-
             if (current.hash !== hashCheck || current.previousHash !== prev.hash) {
                 console.warn("❌ Error en bloque", i, {
                     esperado: hashCheck,
@@ -95,10 +90,8 @@
         const statusDiv = document.getElementById('chainStatus');
         list.innerHTML = '';
         statusDiv.innerHTML = '';
-
         if (chainObj && chainObj.chain.length) {
             const chain = chainObj.chain;
-
             if (validateChain(chain)) {
                 statusDiv.textContent = "✅ Cadena válida: no ha sido alterada.";
                 statusDiv.style.color = "green";
@@ -106,7 +99,6 @@
                 statusDiv.textContent = "❌ Cadena inválida: se detectaron modificaciones.";
                 statusDiv.style.color = "red";
             }
-
             chain.forEach((block, idx) => {
                 const li = document.createElement('li');
                 li.innerHTML = `<strong>Bloque #${idx}</strong><br>
@@ -119,17 +111,11 @@
                     Previous Hash: <span style="font-size:0.9em;">${block.previousHash || 'N/A'}</span>`;
                 list.appendChild(li);
             });
-
         } else {
             list.innerHTML = '<li>No se encontró la cadena seleccionada o no tiene movimientos.</li>';
         }
     };
-
     updateChainOptions();
 </script>
-
-
-
 </body>
 </html>
-  
