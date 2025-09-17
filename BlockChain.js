@@ -28,6 +28,7 @@ class Block {
 class Blockchain {
     constructor(genesis) {
         this.chain = [this.createFirstBlock(genesis)];
+        counter = 1
     }
     createFirstBlock(data) {
         return new Block(0, data);
